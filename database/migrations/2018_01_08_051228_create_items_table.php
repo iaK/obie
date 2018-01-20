@@ -18,7 +18,6 @@ class CreateItemsTable extends Migration
             $table->string("name");
             $table->integer("user_id");
             $table->integer("shopping_list_id");
-            $table->string('password');
             $table->timestamps();
         });
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Item;
 use App\User;
@@ -30,9 +30,11 @@ class UserTest extends TestCase
     public function it_can_have_lists()
     {
         $user = create(User::class);
-        create(ShoppingList::class, ["user_id" => $user->id], 2);
+        $list = make(ShoppingList::class);
 
-        $this->assertCount(2, $user->shoppingLists);
+        $user->createList($list);
+
+        $this->assertCount(1, $user->shoppingLists);
     }
 
     /**
@@ -42,8 +44,41 @@ class UserTest extends TestCase
     {
         $user = create(User::class);
 
-        $list = create(ShoppingList::class, ["user_id" => $user->id]);
+        $list = make(ShoppingList::class);
+        $user->createList($list);
+        $this->assertEquals($list->fresh()->id, $user->getFirstList()->id);
+    }
 
-        $this->assertEquals($list->id, $user->getFirstList()->id);
+    /**
+    * @test
+    */
+    public function it_can_get_its_current_list()
+    {
+        $list = create(ShoppingList::class);
+        $user = create(User::class, ["active_shopping_list_id" => $list->id]);
+
+        $this->assertEquals($user->activeList->id, $list->id);
+    }
+
+    /**
+    * @test
+    */
+    public function it_can_set_its_active_list()
+    {
+        $list = create(ShoppingList::class);
+        $user = create(User::class);
+
+        $user->setActiveList($list);
+        $this->assertEquals($user->fresh()->activeList->id, $list->id);
+    }
+
+    public function when_it_creates_a_list_it_owns_it()
+    {
+        $list = make(ShoppingList::class);
+        $user = create(User::class);
+
+        $user->createList($list);
+
+        $this->assertEquals($user->id, $list->fresh()->owner->id);
     }
 }

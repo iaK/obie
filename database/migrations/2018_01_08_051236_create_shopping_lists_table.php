@@ -15,8 +15,9 @@ class CreateShoppingListsTable extends Migration
     {
         Schema::create('shopping_lists', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer("owner_id")->nullable();
             $table->string("name");
-            $table->integer('user_id');
+            $table->string('password')->nullable();
             $table->timestamps();
         });
     }

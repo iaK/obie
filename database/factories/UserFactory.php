@@ -21,6 +21,7 @@ $factory->define(User::class, function (Faker $faker) {
         'username' => $faker->name,
         'email' => $faker->unique()->safeEmail,
         'mobile' => "070" . rand(1000000, 9999999),
+        "facebook_id" => str_random(10),
         'password' => $password ?: $password = bcrypt('secret'),
         'remember_token' => str_random(10),
     ];

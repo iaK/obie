@@ -3,13 +3,23 @@
 namespace App;
 
 use App\Item;
+use App\Events\ListDeleted;
 use Illuminate\Database\Eloquent\Model;
 
 class ShoppingList extends Model
 {
-    public function user()
+    protected $dispatchesEvents = [
+        'deleted' => ListDeleted::class,
+    ];
+
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class);
+    }
+
+    public function owner()
+    {
+        return $this->BelongsTo(User::class, "owner_id");
     }
 
     public function items()
@@ -17,12 +27,11 @@ class ShoppingList extends Model
         return $this->hasMany(Item::class);
     }
 
-
     public function addItem($item)
     {
         return $this->items()->create([
             "user_id" => auth()->id(),
-            "name" => $item,
+            "name" => trim($item),
         ]);
     }
 

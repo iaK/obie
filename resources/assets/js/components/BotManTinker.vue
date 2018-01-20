@@ -113,12 +113,13 @@
         },
 
         methods: {
-            _addMessage(text, attachment, isMine) {
+            _addMessage(text, attachment, isMine, id) {
                 this.messages.push({
                     'isMine': isMine,
                     'user': isMine ? '👨' : '🤖',
                     'text': text,
                     'attachment': attachment || {},
+                    'id': id,
                 });
             },
 
@@ -130,7 +131,7 @@
                     return;
                 }
 
-                this._addMessage(messageText, null, true);
+                this._addMessage(messageText, null, true, 0);
 
                 axios.post(API_ENDPOINT, {
                     driver: 'web',
@@ -139,7 +140,7 @@
                 }).then(response => {
                     let messages = response.data.messages || [];
                     messages.forEach(msg => {
-                        this._addMessage(msg.text, msg.attachment, false);
+                        this._addMessage(msg.text, msg.attachment, false, id);
                     });
                 }, response => {
 

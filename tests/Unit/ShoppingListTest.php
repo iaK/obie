@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit;
 
 use App\Item;
 use App\User;
@@ -22,17 +22,6 @@ class ShoppingListTest extends TestCase
         create(Item::class, ["shopping_list_id" => $list->id], 2);
 
         $this->assertCount(2, $list->items);
-    }
-
-    /**
-    * @test
-    */
-    public function it_belongs_to_a_user()
-    {
-        $user = create(User::class);
-        $list = create(ShoppingList::class, ["user_id" => $user->id]);
-
-        $this->assertEquals($user->id, $list->user->id);
     }
 
     /**
@@ -79,4 +68,49 @@ class ShoppingListTest extends TestCase
 
         $this->assertCount(0, $list->items);
     }
+
+    /**
+    * @test
+    */
+    public function it_can_have_a_owner()
+    {
+        $user = create(User::class);
+        $list = make(ShoppingList::class);
+
+        $user->createList($list);
+
+        $this->assertEquals($user->id, $list->fresh()->owner->id);
+    }
+
+    /**
+    * @test
+    */
+    public function it_can_delete_a_list()
+    {
+        $user = $this->signIn();
+
+        $list = make(ShoppingList::class);
+        $user->createList($list);
+
+        $user->deleteList($list);
+
+        $this->assertEmpty($user->ownedShoppingLists);
+    }
+
+    /**
+    * @test
+    */
+    public function it_removes_all_relations_on_delete()
+    {
+        $user = $this->signIn();
+
+        $list = make(ShoppingList::class);
+
+        $user->createList($list);
+
+        $user->activeList->delete();
+
+        $this->assertNull($user->fresh()->activeList);
+    }
+
 }

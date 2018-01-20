@@ -5,10 +5,10 @@ use App\ShoppingList;
 use Faker\Generator as Faker;
 
 $factory->define(ShoppingList::class, function (Faker $faker) {
+    static $password;
+
     return [
-        "name" => $faker->name,
-        "user_id" => function() {
-            return factory(User::class)->create()->id;
-        },
+        "name" => $faker->word,
+        'password' => $password ?: $password = bcrypt('secret'),
     ];
 });

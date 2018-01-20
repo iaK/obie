@@ -8,22 +8,31 @@ use App\ShoppingList;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Conversations\CreateListConversation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 class CreateListConversationTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
     * @test
     */
     public function it_can_create_a_list()
     {
-        $this->signIn(["username" => "isak"]);
+        $user = create(User::class, [
+            "facebook_id" => 999
+        ]);
 
-        $this->bot->receives("skapa lista")
+        $this->bot
+            ->setUser([
+                "id" => $user->facebook_id,
+                "username" => $user->username,
+            ])
+            ->receives("skapa lista")
             ->assertReply(
                 sprintf(
                     CreateListConversation::$askListnameText,
-                    "isak"
+                    $user->username
                 )
             )
             ->receives("dunderlistan")
@@ -41,14 +50,33 @@ class CreateListConversationTest extends TestCase
                 vsprintf(
                     CreateListConversation::$shareInstructionText,
                     [
-                        "isak",
+                        $user->username,
                         "dunderlistan"
                     ]
                 )
             ]);
 
-        $this->assertEquals("isak", User::first()->username);
+        $this->assertEquals($user->username, User::first()->username);
         $this->assertEquals("dunderlistan", ShoppingList::first()->name);
-        $this->assertEquals(User::first()->id, shoppingList::first()->user->id);
+        $this->assertEquals($user->id, shoppingList::first()->owner->id);
+        $this->assertEquals($user->id, shoppingList::first()->users()->first()->id);
     }
+
+    /**
+    * @test
+    * @expectedException Exception
+    */
+    public function non_users_cant_create_lists()
+    {
+        $this->withExceptionHandling();
+
+        $this->bot
+            ->receives("skapa lista")
+            ->assertReply(
+                "Du verkar inte vara registrerad hos oss. skriv \"hej\" för att registrera dig."
+            );
+
+        $this->assertEmpty(ShoppingList::all());
+    }
+
 }
