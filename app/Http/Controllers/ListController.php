@@ -14,6 +14,14 @@ class ListController extends Controller
         $this->user = auth()->user();
     }
 
+    public function index($bot)
+    {
+        $this->auth($bot);
+
+        $bot->reply(view("showLists", ["lists" => $this->user->shoppingLists])->render());
+    }
+
+
     public function store($bot)
     {
         //create new list, choose password etc.
@@ -21,16 +29,6 @@ class ListController extends Controller
 
     public function show($bot)
     {
-        $this->auth($bot);
-
-        if (!$this->user->activeList) {
-            $bot->reply("Du har ingen aktiv lista. Skapa/anslut/använd en.");
-            return;
-        }
-
-        $list = auth()->user()->activeList;
-
-        $bot->reply(view("showList", ["list" => $list])->render());
     }
 
     public function join($bot, $user, $list)

@@ -1,4 +1,4 @@
-{{ $list->name }}:\n\n
-{{ collect($list->items)->map( function($item) {
-    return "* $item->name" . ' \n';
-})->implode("") }}
+{{ $list->name }}:
+@foreach($list->items as $item)
+* {{ $item->name}}
+@endforeach

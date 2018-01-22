@@ -37,7 +37,7 @@ class ShoppingList extends Model
 
     public function removeItem($item)
     {
-        return $this->items()->where("name", $item)->delete();
+        return $this->items()->whereName(trim($item))->delete();
     }
 
     public function clear()

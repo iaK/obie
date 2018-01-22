@@ -24,19 +24,16 @@ class ItemsTest extends TestCase
     */
     public function it_can_add_to_a_shopping_list()
     {
-        $user = $this->signIn();
-        $list = make(ShoppingList::class);
-        $user->createList($list);
-
+        $this->signInUserWithList();
 
         $this->bot
             ->setUser([
-                "id" => $user->facebook_id
+                "id" => $this->user->facebook_id
             ])
             ->receives("handla ost")
             ->assertReply("ok");
 
-        $this->assertCount(1, $list->items);
+        $this->assertCount(1, $this->list->items);
         $this->assertEquals("ost", Item::first()->name);
     }
 
@@ -45,17 +42,15 @@ class ItemsTest extends TestCase
     */
     public function several_items_can_be_added()
     {
-        $user = $this->signIn();
-        $list = make(ShoppingList::class);
-        $user->createList($list);
+        $this->signInUserWithList();
 
         $this->bot
             ->setUser([
-                "id" => $user->facebook_id
+                "id" => $this->user->facebook_id
             ])
             ->receives("handla ost, en liter mjölk");
 
-        $this->assertCount(2, $list->items);
+        $this->assertCount(2, $this->list->items);
     }
 
     /**
@@ -63,26 +58,48 @@ class ItemsTest extends TestCase
     */
     public function it_can_remove_an_item_from_a_list()
     {
-        $user = $this->signIn();
-        $list = make(ShoppingList::class);
-        $user->createList($list);
+        $this->signInUserWithList();
 
-        $item = create(Item::class, [
-            "shopping_list_id" => $list->id,
-            "user_id" => $user->id,
+        create(Item::class, [
+            "shopping_list_id" => $this->list->id,
+            "user_id" => $this->user->id,
             "name" => "ost",
         ]);
 
-        $this->assertCount(1, $list->items);
+        $this->assertCount(1, $this->list->items);
 
         $this->bot
             ->setUser([
-                "id" => $user->facebook_id
+                "id" => $this->user->facebook_id
             ])
             ->receives("ta bort ost")
             ->assertReply("ok");
 
-        $this->assertCount(0, $list->fresh()->items);
+        $this->assertCount(0, $this->list->fresh()->items);
+    }
+
+    /**
+    * @test
+    */
+    public function several_items_can_be_removed()
+    {
+        $this->signInUserWithList();
+
+        $items = create(Item::class, [
+            "shopping_list_id" => $this->list->id,
+            "user_id" => $this->user->id,
+        ], 3);
+
+        $this->assertCount(3, $this->list->items);
+
+        $this->bot
+            ->setUser([
+                "id" => $this->user->facebook_id
+            ])
+            ->receives("ta bort {$items[0]->name}, {$items[1]->name}")
+            ->assertReply("ok");
+
+        $this->assertCount(1, $this->list->fresh()->items);
     }
 
     /**
@@ -90,22 +107,41 @@ class ItemsTest extends TestCase
     */
     public function it_can_clear_a_list()
     {
-        $user = $this->signIn();
-        $list = make(ShoppingList::class);
-        $user->createList($list);
+        $this->signInUserWithList();
 
-        $item = create(Item::class, [
-            "shopping_list_id" => $list->id,
-            "user_id" => $user->id,
+        create(Item::class, [
+            "shopping_list_id" => $this->list->id,
+            "user_id" => $this->user->id,
             "name" => "ost",
         ], 5);
 
         $this->bot
             ->setUser([
-                "id" => $user->facebook_id
+                "id" => $this->user->facebook_id
             ])
             ->receives("töm");
 
-        $this->assertCount(0, $list->fresh()->items);
+        $this->assertCount(0, $this->list->fresh()->items);
     }
+
+/**
+    * @test
+    */
+    public function it_can_display_a_list()
+    {
+        $this->signInUserWithList();
+
+        create(Item::class, [
+            "shopping_list_id" => $this->list->id,
+            "user_id" => $this->user->id,
+        ]);
+
+        $this->bot
+            ->setUser([
+                "id" => $this->user->facebook_id
+            ])
+            ->receives("visa lista")
+            ->assertReply(view("showList", ["list" => $this->list->fresh()])->render());
+    }
+
 }

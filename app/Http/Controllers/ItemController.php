@@ -14,6 +14,21 @@ class ItemController extends Controller
         $this->user = auth()->user();
     }
 
+    public function index($bot)
+    {
+        $this->auth($bot);
+
+        if (!$this->user->activeList) {
+            $bot->reply("Du har ingen aktiv lista. Skapa/anslut/använd en.");
+            return;
+        }
+
+        $list = $this->user->activeList;
+
+        $bot->reply(view("showList", ["list" => $list])->render());
+    }
+
+
     public function store($bot, $items)
     {
         $this->auth($bot);
@@ -24,7 +39,7 @@ class ItemController extends Controller
         }
 
         collect(explode(",", $items))->each( function($item) {
-            auth()->user()->activeList->addItem($item);
+            $this->user->activeList->addItem($item);
         });
 
         $bot->reply("ok");
@@ -40,9 +55,8 @@ class ItemController extends Controller
         }
 
         collect(explode(",", $items))->each( function($item) {
-            auth()->user()->activeList->removeItem($item);
+            $this->user->activeList->removeItem($item);
         });
-
 
         $bot->reply("ok");
     }
@@ -56,7 +70,7 @@ class ItemController extends Controller
             return;
         }
 
-        auth()->user()->activeList->clear();
+        $this->user->activeList->clear();
 
         $bot->reply("ok");
     }

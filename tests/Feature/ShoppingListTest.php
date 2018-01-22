@@ -21,28 +21,6 @@ class ShoppingListTest extends TestCase
     /**
     * @test
     */
-    public function it_can_display_a_list()
-    {
-        $user = $this->signIn();
-        $list = make(ShoppingList::class);
-        $user->createList($list);
-        $item = create(Item::class, [
-            "shopping_list_id" => $list->id,
-            "user_id" => $user->id,
-        ]);
-
-        $this->bot
-            ->setUser([
-                "id" => $user->facebook_id
-            ])
-            ->receives("visa lista")
-            ->assertReply(view("showList", ["list" => $list->fresh()])->render());
-    }
-
-
-    /**
-    * @test
-    */
     public function it_instructs_the_user_when_it_has_more_than_one_list()
     {
         $user = $this->signIn();
@@ -65,20 +43,18 @@ class ShoppingListTest extends TestCase
     */
     public function it_can_delete_a_list()
     {
-        $user = $this->signIn();
-        $list = make(ShoppingList::class);
-        $user->createList($list);
+        $this->signInUserWithList();
 
         $this->bot
             ->setUser([
-                "id" => $user->facebook_id
+                "id" => $this->user->facebook_id
             ])
-            ->receives("radera lista {$list->name}")
+            ->receives("radera lista {$this->list->name}")
             ->assertReply("Listan borttagen.");
 
         $this->assertEmpty(ShoppingList::all());
-        $this->assertNull($user->fresh()->activeList);
-        $this->assertEmpty($user->shoppingLists);
+        $this->assertNull($this->user->fresh()->activeList);
+        $this->assertEmpty($this->user->shoppingLists);
     }
 
     /**
@@ -86,10 +62,11 @@ class ShoppingListTest extends TestCase
     */
     public function a_user_cannot_remove_a_list_he_dosent_own()
     {
-        $user = $this->signIn();
         $owner = create(User::class);
         $list = make(ShoppingList::class);
         $owner->createList($list);
+
+        $user = $this->signIn();
         $user->joinList($list);
 
         $this->assertEquals($user->activeList->id, $list->id);
@@ -109,10 +86,11 @@ class ShoppingListTest extends TestCase
     */
     public function a_user_can_leave_a_list()
     {
-        $user = $this->signIn();
         $owner = create(User::class);
         $list = make(ShoppingList::class);
         $owner->createList($list);
+
+        $user = $this->signIn();
         $user->joinList($list);
 
         $this->bot
@@ -124,5 +102,25 @@ class ShoppingListTest extends TestCase
 
         $this->assertNull($user->fresh()->activeList);
         $this->assertCount(0, $user->fresh()->shoppingLists);
+    }
+
+    /**
+    * @test
+    */
+    public function it_can_display_all_your_lists()
+    {
+        $this->signInUserWithList();
+        $this->user->shoppingLists(make(ShoppingList::class));
+
+        $this->bot
+            ->setUser([
+                "id" => $this->user->id,
+            ])
+            ->receives("visa listor")
+            ->assertReply(
+                view("showLists", [
+                    "lists" => $this->user->shoppingLists
+                ])
+            ->render());
     }
 }

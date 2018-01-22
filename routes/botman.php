@@ -14,29 +14,19 @@ $middleware = new AuthMiddleware;
 $botman->group([],function($bot) {
     $bot->hears("anslut till {user} lista {list}", ListController::class.'@join');
     $bot->hears("lämna lista {list}", UserController::class."@leave");
-    $bot->hears("radera lista {listname}", ListController::class."@delete");
     $bot->hears("använd {list}", UserController::class."@setActiveList");
+
+    // Fixa!
+    $bot->hears("visa listor", ListController::class."@index");
+    $bot->hears("radera lista {listname}", ListController::class."@delete");
+    $bot->hears("skapa lista", ListController::class."@create");
+
+    $bot->hears("visa lista", ItemController::class."@index");
     $bot->hears("handla (.+)", ItemController::class.'@store');
     $bot->hears("ta bort (.+)", ItemController::class.'@destroy');
     $bot->hears("töm", ItemController::class.'@empty');
-    $bot->hears("visa lista", ListController::class."@show");
-    $bot->hears("skapa lista", ListController::class."@create");
-    // Fixa!
-    //$bot->hears("visa listor");
 
-    $bot->hears("hjälp", function($bot) {
-        $bot->reply("
-        * \"anslut till [användarnamn] lista [lista]\" - Anslut till en annan användares lista.
-        * \"skapa lista\" - Skapa en lista.
-        * \"lämna lista [lista]\" - Lämna lista.
-        * \"radera lista [lista]\" - Radera lista.
-        * \"handla [vara]\" - Sätt upp en vara på listan.
-        * \"ta bort [vara]\" - Ta bort en vara från listan.
-        * \"töm\" - Töm aktiv lista.
-        * \"visa lista\" - Visa hela aktiva listan.
-        * \"använd [lista]\" - Byt aktiv lista");
-    });
-
+    $bot->hears("hjälp", CommandController::class."@index");
     $bot->fallback(function($bot) {
         $bot->reply("Jag känner inte igen det kommandot. skriv \"hjälp\" för att se alla mina kommandon");
     });
