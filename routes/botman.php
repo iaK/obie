@@ -4,6 +4,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ListController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BotManController;
+use App\Http\Controllers\CommandController;
 use App\Http\Controllers\FallbackController;
 
 $botman = resolve('botman');
