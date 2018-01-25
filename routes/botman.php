@@ -16,6 +16,7 @@ $botman->group([],function($bot) {
     $bot->hears("lämna lista {listname}", UserController::class."@leave");
     $bot->hears("använd {listname}", UserController::class."@setActiveList");
     $bot->hears("ändra användarnamn", UserController::class."@updateName");
+    $bot->hears("visa användarnamn", UserController::class."@showUsername");
 
     $bot->hears("visa listor", ListController::class."@index");
     $bot->hears("radera lista {listname}", ListController::class."@delete");

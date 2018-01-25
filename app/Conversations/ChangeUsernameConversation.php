@@ -14,6 +14,14 @@ class ChangeUsernameConversation extends Conversation
 
     public static $usernameAlreadyInUse = "Användarnamnet är upptaget, testa ett annat...";
 
+    protected $user;
+
+    public function __construct($user)
+    {
+        $this->user = $user;
+    }
+
+
     public function askNewUsername($question)
     {
         $this->ask($question, function(Answer $answer) {
@@ -24,9 +32,8 @@ class ChangeUsernameConversation extends Conversation
                 $this->askNewUsername($this::$usernameAlreadyInUse);
             }
 
-            $user = auth()->user();
-            $user->username = $username;
-            $user->save();
+            $this->user->username = $username;
+            $this->user->save();
 
             $this->say($this::$confirmUsernameText);
 

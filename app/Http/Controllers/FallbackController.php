@@ -10,7 +10,7 @@ class FallbackController extends Controller
 {
     public function index($bot)
     {
-        if(!Auth::check()) {
+        if (!$this->getUser($bot)) {
             $bot->startConversation(new CreateUserConversation);
         } else {
             $bot->reply("Jag känner inte igen det kommandot. skriv \"hjälp\" för att se alla mina kommandon");

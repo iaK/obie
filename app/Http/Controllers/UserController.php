@@ -44,8 +44,16 @@ class UserController extends Controller
     {
         $this->auth($bot);
 
-        $bot->startConversation(new ChangeUsernameConversation);
+        $bot->startConversation(new ChangeUsernameConversation($this->user));
     }
+
+    public function showUsername($bot)
+    {
+        $this->auth($bot);
+
+        $bot->reply("Ditt användarnamn: {$this->user->username}");
+    }
+
 
 
 

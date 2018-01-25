@@ -20,19 +20,35 @@ class Controller extends BaseController
         $this->user = auth()->user();
     }
 
-
     public function auth($bot)
+    {
+        if(Auth::check()) {
+            return;
+        }
+
+        $user = $this->getUser($bot);
+
+        if (!$user) {
+            return $this->sayNotAuthenticated($bot);
+        }
+
+        Auth::login($user);
+
+        $this->user = $user;
+    }
+
+    public function getUser($bot)
     {
         $user = $bot->getUser();
 
         if(!$user) {
-            $this->sayNotAuthenticated($bot);
+            return false;
         }
 
         $id = $user->getId();
 
         if(!$id) {
-            $this->sayNotAuthenticated($bot);
+            return false;
         }
 
         $user = User::whereFacebookId($id)->first();
@@ -42,13 +58,12 @@ class Controller extends BaseController
         }
 
         if(!$user) {
-            $this->sayNotAuthenticated($bot);
+            return false;
         }
 
-        Auth::login($user);
-
-        $this->user = $user;
+        return $user;
     }
+
 
 
     public function sayNotAuthenticated($bot)

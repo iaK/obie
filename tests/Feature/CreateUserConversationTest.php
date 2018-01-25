@@ -40,7 +40,11 @@ class CreateUserConversationTest extends TestCase
     {
         create(User::class, ["username" => "isak"]);
 
-        $this->bot->receives("hej")
+        $this->bot
+            ->setUser([
+                "id" => 5 // any id that isnt occupied
+            ])
+            ->receives("hej")
             ->assertReply(CreateUserConversation::$askUsernameText)
             ->receives("isak")
             ->assertReplies([
