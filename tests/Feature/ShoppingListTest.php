@@ -25,12 +25,6 @@ class ShoppingListTest extends TestCase
     {
         $user = $this->signIn();
 
-        $this->bot
-            ->setUser([
-                "id" => $user->id
-            ])
-            ->receives("initialize conversation");
-
         $lists = create(ShoppingList::class, [], 2);
 
         event(new ListJoined($lists, resolve("botman")));
@@ -60,26 +54,26 @@ class ShoppingListTest extends TestCase
     /**
     * @test
     */
-    public function a_user_cannot_remove_a_list_he_dosent_own()
-    {
-        $owner = create(User::class);
-        $list = make(ShoppingList::class);
-        $owner->createList($list);
+    // public function a_user_cannot_remove_a_list_he_dosent_own()
+    // {
+    //     $owner = create(User::class);
+    //     $list = make(ShoppingList::class);
+    //     $owner->createList($list);
 
-        $user = $this->signIn();
-        $user->joinList($list);
+    //     $user = $this->signIn();
+    //     $user->joinList($list);
 
-        $this->assertEquals($user->activeList->id, $list->id);
+    //     $this->assertEquals($user->activeList->id, $list->id);
 
-        $this->bot
-            ->setUser([
-                "id" => $user->facebook_id
-            ])
-            ->receives("radera lista {$list->name}")
-            ->assertReply("Du har ingen lista som heter {$list->name}");
+    //     $this->bot
+    //         ->setUser([
+    //             "id" => $user->facebook_id
+    //         ])
+    //         ->receives("radera lista {$list->name}")
+    //         ->assertReply("Du har ingen lista som heter {$list->name}");
 
-        $this->assertCount(1, ShoppingList::all());
-    }
+    //     $this->assertCount(1, ShoppingList::all());
+    // }
 
     /**
     * @test

@@ -19,15 +19,9 @@ class CreateListConversationTest extends TestCase
     */
     public function it_can_create_a_list()
     {
-        $user = create(User::class, [
-            "facebook_id" => 999
-        ]);
+        $user = $this->signIn();
 
         $this->bot
-            ->setUser([
-                "id" => $user->facebook_id,
-                "username" => $user->username,
-            ])
             ->receives("skapa lista")
             ->assertReply(
                 sprintf(
@@ -58,8 +52,8 @@ class CreateListConversationTest extends TestCase
 
         $this->assertEquals($user->username, User::first()->username);
         $this->assertEquals("dunderlistan", ShoppingList::first()->name);
-        $this->assertEquals($user->id, shoppingList::first()->owner->id);
-        $this->assertEquals($user->id, shoppingList::first()->users()->first()->id);
+        $this->assertEquals($user->id, ShoppingList::first()->owner->id);
+        $this->assertEquals($user->id, ShoppingList::first()->users()->first()->id);
     }
 
     /**
@@ -76,7 +70,7 @@ class CreateListConversationTest extends TestCase
                 "Du verkar inte vara registrerad hos oss. skriv \"hej\" för att registrera dig."
             );
 
-        $this->assertEmpty(ShoppingList::all());
+        $this->assertEmpty(ShoippingList::all());
     }
 
 }

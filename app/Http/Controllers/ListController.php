@@ -5,37 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Conversations\CreateListConversation;
 use App\Conversations\JoinShoppingListConversation;
+use App\Conversations\ChangeListPasswordConversation;
 
 class ListController extends Controller
 {
-
-    public function __construct($bot)
-    {
-        $this->user = auth()->user();
-    }
-
     public function index($bot)
     {
         $this->auth($bot);
 
-        $bot->reply(view("showLists", ["lists" => $this->user->shoppingLists])->render());
+        $bot->reply(view("showLists", [
+            "lists" => $this->user->shoppingLists]
+        )->render());
     }
 
-
-    public function store($bot)
-    {
-        //create new list, choose password etc.
-    }
-
-    public function show($bot)
-    {
-    }
-
-    public function join($bot, $user, $list)
+    public function join($bot, $user, $listname)
     {
         $this->auth($bot);
 
-        $bot->startConversation(new JoinShoppingListConversation($user, $list));
+        $bot->startConversation(new JoinShoppingListConversation($user, $listname));
     }
 
 
@@ -45,6 +32,14 @@ class ListController extends Controller
 
         $bot->startConversation(new CreateListConversation);
     }
+
+    public function updatePassword($bot)
+    {
+        $this->auth($bot);
+
+        $bot->startConversation(new ChangeListPasswordConversation($this->user));
+    }
+
 
     public function delete($bot, $listname)
     {

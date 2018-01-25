@@ -58,6 +58,18 @@ class User extends Authenticatable
         return $this;
     }
 
+    public function ownsList(ShoppingList $list)
+    {
+        return $list->owner_id == $this->id;
+    }
+
+    public function ownsActiveList()
+    {
+        return $this->ownsList($this->activeList);
+    }
+
+
+
 
     public function activeList()
     {

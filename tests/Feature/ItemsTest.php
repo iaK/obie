@@ -27,14 +27,22 @@ class ItemsTest extends TestCase
         $this->signInUserWithList();
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("handla ost")
             ->assertReply("ok");
 
-        $this->assertCount(1, $this->list->items);
-        $this->assertEquals("ost", Item::first()->name);
+        $this->bot
+            ->receives("köp smör")
+            ->assertReply("ok");
+
+        $this->bot
+            ->receives("lägg till bröd")
+            ->assertReply("ok");
+
+        $items = Item::all()->toArray();
+        $this->assertCount(3, $items);
+        $this->assertEquals("ost", $items[0]["name"]);
+        $this->assertEquals("smör", $items[1]["name"]);
+        $this->assertEquals("bröd", $items[2]["name"]);
     }
 
     /**
@@ -45,9 +53,6 @@ class ItemsTest extends TestCase
         $this->signInUserWithList();
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("handla ost, en liter mjölk");
 
         $this->assertCount(2, $this->list->items);
@@ -69,9 +74,6 @@ class ItemsTest extends TestCase
         $this->assertCount(1, $this->list->items);
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("ta bort ost")
             ->assertReply("ok");
 
@@ -93,9 +95,6 @@ class ItemsTest extends TestCase
         $this->assertCount(3, $this->list->items);
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("ta bort {$items[0]->name}, {$items[1]->name}")
             ->assertReply("ok");
 
@@ -116,9 +115,6 @@ class ItemsTest extends TestCase
         ], 5);
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("töm");
 
         $this->assertCount(0, $this->list->fresh()->items);
@@ -137,9 +133,6 @@ class ItemsTest extends TestCase
         ]);
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("visa lista")
             ->assertReply(view("showList", ["list" => $this->list->fresh()])->render());
     }

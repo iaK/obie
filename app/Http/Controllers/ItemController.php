@@ -7,13 +7,6 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
-    protected $user;
-
-    public function __construct($bot)
-    {
-        $this->user = auth()->user();
-    }
-
     public function index($bot)
     {
         $this->auth($bot);
@@ -29,7 +22,7 @@ class ItemController extends Controller
     }
 
 
-    public function store($bot, $items)
+    public function store($bot, $verb, $items)
     {
         $this->auth($bot);
 

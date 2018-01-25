@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ShoppingList;
 use Illuminate\Http\Request;
 use App\Conversations\CreateUserConversation;
+use App\Conversations\ChangeUsernameConversation;
 
 class UserController extends Controller
 {
@@ -13,30 +14,39 @@ class UserController extends Controller
         $bot->startConversation(new CreateUserConversation);
     }
 
-    public function setActiveList($bot, $list)
+    public function setActiveList($bot, $listname)
     {
         $this->auth($bot);
 
-        $list = auth()->user()->shoppingLists()->whereName($list)->first();
+        $list = $this->user->shoppingLists()->whereName($listname)->first();
 
         if ($list) {
-            auth()->user()->setActiveList($list);
+            $this->user->setActiveList($list);
 
             return $bot->reply("{$list->name} är nu satt som aktiv!");
         }
 
         $bot->reply("Ingen lista hittad..");
     }
-    public function leave($bot, $list)
+
+    public function leave($bot, $listname)
     {
         $this->auth($bot);
 
-        if ($list = ShoppingList::whereName($list)->first()) {
-            auth()->user()->leaveList($list);
+        if ($list = ShoppingList::whereName($listname)->first()) {
+            $this->user->leaveList($list);
         }
 
         $bot->reply("ok!");
     }
+
+    public function updateName($bot)
+    {
+        $this->auth($bot);
+
+        $bot->startConversation(new ChangeUsernameConversation);
+    }
+
 
 
 

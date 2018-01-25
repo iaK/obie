@@ -13,6 +13,14 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    protected $user;
+
+    public function __construct()
+    {
+        $this->user = auth()->user();
+    }
+
+
     public function auth($bot)
     {
         $user = $bot->getUser();
