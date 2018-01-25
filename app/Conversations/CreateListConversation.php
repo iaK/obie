@@ -37,6 +37,12 @@ class CreateListConversation extends BaseConversation
 
     public static $shareInstructionText = "Om du vill dela din lista till andra, be dom skicka ett meddelande med denna struktur \n \"Anslut till %s lista %s\"\n Dom kommer få skriva in det lösenord du valt, sedan kan dom också se listan, samt lägga till och ta bort saker. \nSå sjukt smidigt!";
 
+    public function __construct($user)
+    {
+        $this->user = $user;
+    }
+
+
     public function askListname()
     {
         $this->ask(sprintf($this::$askListnameText, $this->user->username), function(Answer $answer) {
@@ -62,6 +68,8 @@ class CreateListConversation extends BaseConversation
             $this->say(sprintf($this::$shareInstructionText, $this->user->username, $this->listname));
 
             event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
+
+            return;
         });
     }
 
@@ -69,7 +77,6 @@ class CreateListConversation extends BaseConversation
     public function run()
     {
         // This will be called immediately
-        $this->user = auth()->user();
         $this->askListname();
     }
 

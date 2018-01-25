@@ -30,7 +30,7 @@ class ListController extends Controller
     {
         $this->auth($bot);
 
-        $bot->startConversation(new CreateListConversation);
+        $bot->startConversation(new CreateListConversation($this->user));
     }
 
     public function updatePassword($bot)
