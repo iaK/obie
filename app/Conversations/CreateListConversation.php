@@ -34,7 +34,7 @@ class CreateListConversation extends BaseConversation
 
     public static $confirmPasswordText = "Din lista är nu skapat!";
 
-    public static $instructionText = "Din lista är nu skapat! För att lägga till saker på listan skriv \n\"handla [namn]\" så lägger jag till det. \nFör att ta bort något, skriv \"ta bort [namn]\". \nFör att se hela din lista, skriv \"visa lista\". \nOch slutligen - för att tömma listan, skriv \"töm\". Svårare än så är det inte :)";
+    public static $instructionText = "För att lägga till saker på listan skriv \n\"handla [namn]\" så lägger jag till det. \nFör att ta bort något, skriv \"ta bort [namn]\". \nFör att se hela din lista, skriv \"visa lista\". \nOch slutligen - för att tömma listan, skriv \"töm\". Svårare än så är det inte :)";
 
     public static $shareInstructionText = "Om du vill dela din lista till andra, be dom skicka ett meddelande med denna struktur \n \"Anslut till %s lista %s\"\n Dom kommer få skriva in det lösenord du valt, sedan kan dom också se listan, samt lägga till och ta bort saker. \nSå sjukt smidigt!";
 
@@ -62,17 +62,25 @@ class CreateListConversation extends BaseConversation
     {
         $this->ask($this::$askPasswordText, function(Answer $answer) {
 
-            //Reply::dispatch($this->bot, $this::$confirmPasswordText);
+            Reply::dispatch($this->bot, $this::$confirmPasswordText);
             Reply::dispatch($this->bot, $this::$instructionText);
-            //Reply::dispatch($this->bot, sprintf($this::$shareInstructionText, $this->user->username, $this->listname));
+            Reply::dispatch($this->bot, sprintf($this::$shareInstructionText, $this->user->username, $this->listname));
 
             $this->list->password = bcrypt($answer->getText());
             $this->list->save();
 
-
+            $this->askConfirm();
             //event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
         });
     }
+
+    public function askConfirm()
+    {
+        $this->as("testest", function() {
+
+        });
+    }
+
 
 
     public function run()
