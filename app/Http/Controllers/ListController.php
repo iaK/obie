@@ -14,7 +14,7 @@ class ListController extends Controller
         $this->auth($bot);
 
         $bot->reply(view("showLists", [
-            "lists" => $this->user->shoppingLists]
+            "lists" => $this->user->shoppingLists->unique()]
         )->render());
     }
 

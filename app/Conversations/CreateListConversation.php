@@ -71,8 +71,6 @@ class CreateListConversation extends BaseConversation
 
 
             event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
-
-            return;
         });
     }
 
