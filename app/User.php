@@ -3,6 +3,7 @@
 namespace App;
 
 use App\ShoppingList;
+use App\Events\ListJoined;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -80,6 +81,8 @@ class User extends Authenticatable
     {
         $this->shoppingLists()->save($list);
         $this->setActiveList($list);
+
+        event(new ListJoined($this->shoppingLists, resolve("botman")));
 
         return $this;
     }

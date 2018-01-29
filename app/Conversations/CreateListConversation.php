@@ -66,21 +66,12 @@ class CreateListConversation extends BaseConversation
             Reply::dispatch($this->bot, $this::$instructionText);
             Reply::dispatch($this->bot, sprintf($this::$shareInstructionText, $this->user->username, $this->listname));
 
-            // $this->list->password = bcrypt($answer->getText());
-            // $this->list->save();
+            $this->list->password = bcrypt($answer->getText());
+            $this->list->save();
 
-            $this->askConfirm();
-            //event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
+            event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
         });
     }
-
-    public function askConfirm()
-    {
-        $this->ask("testest", function() {
-
-        });
-    }
-
 
 
     public function run()

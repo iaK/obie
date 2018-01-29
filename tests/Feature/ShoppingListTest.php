@@ -9,6 +9,7 @@ use App\ShoppingList;
 use App\Events\ListJoined;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Testing\WithFaker;
+use App\Conversations\CreateListConversation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 
@@ -23,13 +24,37 @@ class ShoppingListTest extends TestCase
     */
     public function it_instructs_the_user_when_it_has_more_than_one_list()
     {
-        $user = $this->signIn();
+        $user = $this->signInUserWithList();
 
-        $lists = create(ShoppingList::class, [], 2);
-
-        event(new ListJoined($lists, resolve("botman")));
-
-        $this->bot->assertReply("Nu är du ansluten till fler listor. För att välja vilken lista som ska vara aktiv - skriv \"lista [lista]\". Du kan bara ha en aktiv lista itaget :)");
+        $this->bot
+            ->receives("skapa lista")
+            ->assertReply(
+                sprintf(
+                    CreateListConversation::$askListnameText,
+                    $this->user->username
+                )
+            )
+            ->receives("dunderlistan")
+            ->assertReplies([
+                sprintf(
+                    CreateListConversation::$confirmListnameText,
+                    "dunderlistan"
+                ),
+                CreateListConversation::$askPasswordText
+            ])
+            ->receives("lösenord")
+            ->assertReplies([
+                CreateListConversation::$confirmPasswordText,
+                CreateListConversation::$instructionText,
+                vsprintf(
+                    CreateListConversation::$shareInstructionText,
+                    [
+                        $this->user->username,
+                        "dunderlistan",
+                    ]
+                ),
+                "Nu är du ansluten till fler listor. För att välja vilken lista som ska vara aktiv - skriv \"använd [lista]\". Du kan bara ha en aktiv lista itaget :)"
+            ]);
     }
 
     /**
@@ -40,9 +65,6 @@ class ShoppingListTest extends TestCase
         $this->signInUserWithList();
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->facebook_id
-            ])
             ->receives("radera lista {$this->list->name}")
             ->assertReply("Listan borttagen.");
 
@@ -54,26 +76,26 @@ class ShoppingListTest extends TestCase
     /**
     * @test
     */
-    // public function a_user_cannot_remove_a_list_he_dosent_own()
-    // {
-    //     $owner = create(User::class);
-    //     $list = make(ShoppingList::class);
-    //     $owner->createList($list);
+    public function a_user_cannot_remove_a_list_he_dosent_own()
+    {
+        $owner = create(User::class);
+        $list = make(ShoppingList::class);
+        $owner->createList($list);
 
-    //     $user = $this->signIn();
-    //     $user->joinList($list);
+        $user = $this->signIn();
+        $user->joinList($list);
 
-    //     $this->assertEquals($user->activeList->id, $list->id);
+        $this->assertEquals($user->activeList->id, $list->id);
 
-    //     $this->bot
-    //         ->setUser([
-    //             "id" => $user->facebook_id
-    //         ])
-    //         ->receives("radera lista {$list->name}")
-    //         ->assertReply("Du har ingen lista som heter {$list->name}");
+        $this->bot
+            ->setUser([
+                "id" => $user->facebook_id
+            ])
+            ->receives("radera lista {$list->name}")
+            ->assertReply("Du har ingen lista som heter {$list->name}");
 
-    //     $this->assertCount(1, ShoppingList::all());
-    // }
+        $this->assertCount(1, ShoppingList::all());
+    }
 
     /**
     * @test
@@ -88,9 +110,6 @@ class ShoppingListTest extends TestCase
         $user->joinList($list);
 
         $this->bot
-            ->setUser([
-                "id" => $user->facebook_id
-            ])
             ->receives("lämna lista {$list->name}")
             ->assertReply("ok!");
 
@@ -107,9 +126,6 @@ class ShoppingListTest extends TestCase
         $this->user->shoppingLists(make(ShoppingList::class));
 
         $this->bot
-            ->setUser([
-                "id" => $this->user->id,
-            ])
             ->receives("visa listor")
             ->assertReply(
                 view("showLists", [
