@@ -30,7 +30,7 @@ class InstructAboutJoinedList
     {
         if ($event->lists->count() > 1) {
 
-            Say::dispatch($event->bot, "Nu är du ansluten till fler listor. För att välja vilken lista som ska vara aktiv - skriv \"använd [lista]\". Du kan bara ha en aktiv lista itaget :)", auth()->id());
+            //Say::dispatch($event->bot, "Nu är du ansluten till fler listor. För att välja vilken lista som ska vara aktiv - skriv \"använd [lista]\". Du kan bara ha en aktiv lista itaget :)", auth()->id());
         }
     }
 }
