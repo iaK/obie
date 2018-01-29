@@ -70,7 +70,7 @@ class CreateListConversation extends BaseConversation
             $this->list->save();
 
 
-            event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
+            //event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
         });
     }
 
