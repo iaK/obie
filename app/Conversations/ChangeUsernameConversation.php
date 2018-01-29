@@ -3,6 +3,7 @@
 namespace App\Conversations;
 
 use App\User;
+use App\Jobs\Reply;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 
@@ -35,8 +36,7 @@ class ChangeUsernameConversation extends Conversation
             $this->user->username = $username;
             $this->user->save();
 
-            $this->say($this::$confirmUsernameText);
-
+            Reply::dispatch($this->bot, $this::$confirmUsernameText);
         });
     }
 

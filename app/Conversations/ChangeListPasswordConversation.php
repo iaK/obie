@@ -2,6 +2,7 @@
 
 namespace App\Conversations;
 
+use App\Jobs\Reply;
 use BotMan\BotMan\Messages\Incoming\Answer;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 
@@ -26,8 +27,7 @@ class ChangeListPasswordConversation extends Conversation
             $list->password = bcrypt($answer->getText());
             $list->save();
 
-            $this->say($this::$confirmPasswordText);
-
+            Reply::dispatch($this->bot, $this::$confirmPasswordText);
         });
     }
 
@@ -39,7 +39,7 @@ class ChangeListPasswordConversation extends Conversation
     public function run()
     {
         if (!$this->user->ownsActiveList()) {
-            $this->say($this::$notYourListText);
+            Reply::dispatch($this->bot, $this::$notYourListText);
             return;
         }
 

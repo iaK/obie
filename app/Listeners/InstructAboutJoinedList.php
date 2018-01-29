@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Jobs\Say;
 use App\Events\ListJoined;
 use BotMan\Drivers\Web\WebDriver;
 use Illuminate\Queue\InteractsWithQueue;
@@ -29,7 +30,7 @@ class InstructAboutJoinedList
     {
         if ($event->lists->count() > 1) {
 
-            $event->bot->say("Nu är du ansluten till fler listor. För att välja vilken lista som ska vara aktiv - skriv \"använd [lista]\". Du kan bara ha en aktiv lista itaget :)", auth()->id());
+            Say::dispatch($event->bot, "Nu är du ansluten till fler listor. För att välja vilken lista som ska vara aktiv - skriv \"använd [lista]\". Du kan bara ha en aktiv lista itaget :)", auth()->id());
         }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Conversations;
 
 use App\User;
+use App\Jobs\Reply;
 use App\ShoppingList;
 use App\Events\ListJoined;
 use Illuminate\Foundation\Inspiring;
@@ -52,7 +53,7 @@ class CreateListConversation extends BaseConversation
             $this->list->name = $this->listname;
             $this->user->createList($this->list);
 
-            $this->say(sprintf($this::$confirmListnameText, $this->listname));
+            Reply::dispatch($this->bot,sprintf($this::$confirmListnameText, $this->listname));
             $this->askPassword();
         });
     }
@@ -63,9 +64,9 @@ class CreateListConversation extends BaseConversation
             $this->list->password = bcrypt($answer->getText());
             $this->list->save();
 
-            $this->say($this::$confirmPasswordText);
-            $this->say($this::$instructionText);
-            $this->say(sprintf($this::$shareInstructionText, $this->user->username, $this->listname));
+            Reply::dispatch($this->bot, $this::$confirmPasswordText);
+            Reply::dispatch($this->bot, $this::$instructionText);
+            Reply::dispatch($this->bot, sprintf($this::$shareInstructionText, $this->user->username, $this->listname));
 
             event(new ListJoined($this->user->fresh()->shoppingLists, $this->bot));
 
