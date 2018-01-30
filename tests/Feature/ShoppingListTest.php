@@ -70,7 +70,6 @@ class ShoppingListTest extends TestCase
 
         $this->assertEmpty(ShoppingList::all());
         $this->assertNull($this->user->fresh()->activeList);
-        $this->assertEmpty($this->user->shoppingLists);
     }
 
     /**
