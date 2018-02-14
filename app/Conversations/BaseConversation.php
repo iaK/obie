@@ -9,7 +9,7 @@ abstract class BaseConversation extends Conversation
 {
     public function stopsConversation(IncomingMessage $message)
     {
-        if ($message->getText() == 'stopp') {
+        if (strtolower($message->getText()) == 'stopp') {
             return true;
         }
 

@@ -9,3 +9,4 @@ Mina kommandon:
 "visa listor" - Visa alla dina listor.
 "använd [lista]" - Byt aktiv lista"
 "anslut till [användarnamn] lista [lista]" - Anslut till en annan användares lista.
+"stopp" - Avbryt pågående konversation.
