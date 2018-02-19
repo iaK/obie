@@ -29,11 +29,29 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    protected $driver;
+
+    public function setDriver($driver)
+    {
+        $this->driver = strtolower($driver);
+
+        return $this;
+    }
+
+    public static function getById($id)
+    {
+        if (config("botman.config.default_driver")) {
+            return self::find($id);
+        }
+
+        return self::where(config("botman.config.default_driver") . "_id", $id)->first();
+    }
+
+
     public function ownedShoppingLists()
     {
         return $this->hasMany(ShoppingList::class, "owner_id");
     }
-
 
     public function shoppingLists()
     {

@@ -26,9 +26,7 @@ class Controller extends BaseController
             return;
         }
 
-        $user = $this->getUser($bot);
-
-        if (!$user) {
+        if (! $user = $this->getUser($bot)) {
             return $this->sayNotAuthenticated($bot);
         }
 
@@ -41,27 +39,7 @@ class Controller extends BaseController
     {
         $user = $bot->getUser();
 
-        if(!$user) {
-            return false;
-        }
-
-        $id = $user->getId();
-
-        if(!$id) {
-            return false;
-        }
-
-        $user = User::whereFacebookId($id)->first();
-
-        if (!$user) {
-            $user = User::find($id);
-        }
-
-        if(!$user) {
-            return false;
-        }
-
-        return $user;
+        return User::getById($user->getId());
     }
 
 

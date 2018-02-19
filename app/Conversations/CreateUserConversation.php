@@ -77,8 +77,6 @@ class CreateUserConversation extends BaseConversation
     {
         if(!auth()->check()) {
             $this->askUsername($this::$askUsernameText);
-        } else {
-            $this->say("hejhej..");
         }
     }
 }

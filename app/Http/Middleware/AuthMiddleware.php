@@ -39,33 +39,7 @@ class AuthMiddleware implements Received, Captured, Matching, Heard, Sending
      */
     public function received(IncomingMessage $message, $next, BotMan $bot)
     {
-        $user = $bot->getUser();
-        if(!$user) {
-            $this->sayNotAuthenticated($bot);
-        }
-
-        $id = $user->getId();
-
-        if(!$id) {
-            $this->sayNotAuthenticated($bot);
-        }
-
-        $user = User::whereFacebookId($id)->first();
-
-        if(!$user) {
-            $this->sayNotAuthenticated($bot);
-        }
-
-        Auth::login($user);
-
         return $next($message);
-    }
-
-
-    public function sayNotAuthenticated($bot)
-    {
-        $bot->reply("Du verkar inte vara registrerad hos oss. skriv \"hej\" för att registrera dig.");
-        throw new \Exception("Unauthorized");
     }
 
     /**
