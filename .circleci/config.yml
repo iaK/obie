@@ -33,6 +33,7 @@ jobs:
             - ./vendor
           key: v1-dependencies-{{ checksum "composer.json" }}
 
+      - run: apt-get install npm
       - run: npm install
       - run: npm run prod
 
